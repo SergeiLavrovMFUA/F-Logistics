@@ -2,22 +2,27 @@ import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
-import { getCharacters } from './services/api.js'
+import { getLogistics } from './services/api.js'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const [characters, setCharacters] = useState([])
+  const [logisticsData, setLogisticsData] = useState([])
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getCharacters()
+    getLogistics()
       .then((data) => {
-        setCharacters(data)
+        console.log('Received data:', data)
+        setLogisticsData(data)
         setError('')
+        setLoading(false)
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Fetch error:', err)
         setError('Не удалось загрузить данные из Postgres')
+        setLoading(false)
       })
   }, [])
 
@@ -42,9 +47,24 @@ function App() {
         >
           Count is {count}
         </button>
+        
         <p>
-          {error || `Загружено записей из Postgres: ${characters.length}`}
+          {loading ? 'Загрузка...' : (error || `Загружено записей из Postgres: ${logisticsData.length}`)}
         </p>
+
+        {/* Отладочный блок: показывает все данные из БД */}
+        <div style={{ textAlign: 'left', marginTop: '20px', background: '#f0f0f0', padding: '10px', borderRadius: '8px' }}>
+          <strong>Данные из таблицы F-Logistics:</strong>
+          {loading ? (
+            <p>Загрузка...</p>
+          ) : error ? (
+            <p style={{ color: 'red' }}>{error}</p>
+          ) : logisticsData.length === 0 ? (
+            <p>В таблице пока нет данных. Добавьте несколько записей в PostgreSQL.</p>
+          ) : (
+            <pre>{JSON.stringify(logisticsData, null, 2)}</pre>
+          )}
+        </div>
       </section>
 
       <div className="ticks"></div>

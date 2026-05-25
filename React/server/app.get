@@ -1,4 +1,4 @@
-('/characters', async (req, res) => {
+('/F-Logistics', async (req, res) => {
       const result = await pool.query('SELECT * FROM
     F-Logistics')  res.json(result.rows)
     })
